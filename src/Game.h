@@ -29,21 +29,24 @@ private:
 
 	//Game Logic
 	bool endGame;
-	unsigned points;
-	int health;
-	float enemySpawnTimer;
-	float enemySpawnTimerMax;
-	int maxEnemies;
-	bool mouseHeld;
+	unsigned userClicks;		   // the amount of user clicks
+	double passiveMultiplier;	   // number of passive clicks per second
+	double clickMultiplier;		   //muliplier of clicks the users recieves when they click
+	int PricePassiveMultiplier;	   //The price of Passive Multiplier
+	int PriceClickerMuliplier;	   //The price of Clicker Multiplier
+	double storeClickerMultiplier; //the Clicker Multiplier value in the store
+	double storePassiveMuliplier;  //the Passive Multiplier value in the store
+	bool mouseHeld;				   //checks to see if the user is holding down on the mouse
 
 	//Game Objects
-	sf::RectangleShape enemy;
-	std::vector<sf::RectangleShape> enemies;
+	sf::CircleShape userClickerButton;				   //the object the user uses to add to their clicker score
+	sf::RectangleShape upgradeClickedMultiplierButton; //the object to upgrade clicker mulitplier
+	sf::RectangleShape upgradePassiveMultiplierButton; //the object to upgrade passive mulitplier
 
 	//Private functions
 	void initVariables();
 	void initWindow();
-	void initEnemies();
+	void initButtons();
 	void initFonts();
 	void initTexts();
 
@@ -61,10 +64,12 @@ public:
 	void pollsEvents();
 	void updateMousePositions();
 	void updateEnemies();
+	void updateButtons();
 	void updateText();
 	void update();
 
 	void renderText(sf::RenderTarget& target);
 	void renderEnemies(sf::RenderTarget& target);
+	void renderButtons(sf::RenderTarget& target);
 	void render();
 };

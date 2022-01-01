@@ -4,13 +4,14 @@ void Game::initVariables()
 {
 	this->window = nullptr;
 
-	//game logic
-	this->points = 0;
-	this->enemySpawnTimerMax = 10.f;
-	this->enemySpawnTimer = this->enemySpawnTimerMax;
-	this->maxEnemies = 10;
+	this->userClicks = 0;
+	this->passiveMultiplier = 1.0;
+	this->clickMultiplier = 1.0;
+	this->PriceClickerMuliplier = 55;
+	this->PricePassiveMultiplier = 55;
+	this->storeClickerMultiplier = 5;
+	this->storePassiveMuliplier = 2.5;
 	this->mouseHeld = false;
-	this->health = 10;
 	this->endGame = false;
 }
 
@@ -22,12 +23,20 @@ void Game::initWindow()
 	this->window->setFramerateLimit(60);
 }
 
-void Game::initEnemies()
+void Game::initButtons()
 {
-	this->enemy.setPosition(sf::Vector2f(10.f, 10.f));
-	this->enemy.setSize(sf::Vector2f(100.f, 100.f));
-	this->enemy.setScale(sf::Vector2f(0.5, 0.5));
-	this->enemy.setFillColor(sf::Color::Cyan);
+
+	this->userClickerButton.setPosition(sf::Vector2f(165.f, 50.f));
+	this->userClickerButton.setRadius(225.f);
+	this->userClickerButton.setFillColor(sf::Color::Cyan);
+
+	this->upgradeClickedMultiplierButton.setPosition(sf::Vector2f(0.f, 530.f));
+	this->upgradeClickedMultiplierButton.setSize(sf::Vector2f(300.f, 100.f));
+	this->upgradeClickedMultiplierButton.setFillColor(sf::Color::Blue);
+
+	this->upgradePassiveMultiplierButton.setPosition(sf::Vector2f(498.f, 530.f));
+	this->upgradePassiveMultiplierButton.setSize(sf::Vector2f(300.f, 100.f));
+	this->upgradePassiveMultiplierButton.setFillColor(sf::Color::Red);
 	// this->enemy.setOutlineColor(sf::Color::Green);
 	// this->enemy.setOutlineThickness(5.f);
 }
@@ -53,7 +62,7 @@ Game::Game()
 	this->initWindow();
 	this->initFonts();
 	this->initTexts();
-	this->initEnemies();
+	this->initButtons();
 }
 
 Game::~Game()
@@ -72,6 +81,7 @@ bool Game::getEndGame() const
 }
 
 //Functions
+/*
 void Game::spawnEnemy()
 {
 	this->enemy.setPosition(
@@ -82,6 +92,7 @@ void Game::spawnEnemy()
 
 	this->enemies.push_back(this->enemy);
 }
+*/
 void Game::pollsEvents()
 {
 	//Event Polling
@@ -113,14 +124,69 @@ void Game::updateMousePositions()
 //Updates the text of the game
 void Game::updateText()
 {
+
 	std::stringstream ss;
-
-	ss << "Points:" << this->points << "\n"
-	   << "Health: " << this->health << "\n";
-
+	ss << "Clicks:" << this->userClicks << "\n";
+	ss << "Passive Clicks:" << this->passiveMultiplier << "\n";
+	ss << "Clicks per click:" << this->clickMultiplier << "\n";
 	this->uiText.setString(ss.str());
 }
 
+void Game::updateButtons()
+{
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		if (this->mouseHeld == false)
+		{
+			this->mouseHeld = true;
+			if (this->userClickerButton.getGlobalBounds().contains(this->mosuePosView))
+			{
+				this->userClicks += clickMultiplier;
+			}
+
+			if (this->upgradeClickedMultiplierButton.getGlobalBounds().contains(this->mosuePosView))
+			{
+				if (userClicks >= static_cast<unsigned int>(PriceClickerMuliplier))
+				{
+					clickMultiplier += storeClickerMultiplier;
+					PriceClickerMuliplier *= 1.5;
+					storeClickerMultiplier *= 2.5;
+					userClicks -= PriceClickerMuliplier;
+				}
+				else
+				{
+					std::stringstream ss;
+					ss << "Sorry, not enough clicks!!"
+					   << "\n";
+					this->uiText.setString(ss.str());
+				}
+			}
+
+			if (this->upgradePassiveMultiplierButton.getGlobalBounds().contains(this->mosuePosView))
+			{
+				if (userClicks >= static_cast<unsigned int>(PricePassiveMultiplier))
+				{
+					passiveMultiplier += storePassiveMuliplier;
+					PricePassiveMultiplier *= 1.5;
+					storePassiveMuliplier *= 2.5;
+					userClicks -= PricePassiveMultiplier;
+				}
+				else
+				{
+					std::stringstream ss;
+					ss << "Sorry, not enough clicks!!"
+					   << "\n";
+					this->uiText.setString(ss.str());
+				}
+			}
+		}
+	}
+	else
+	{
+		this->mouseHeld = false;
+	}
+}
+/*
 void Game::updateEnemies()
 {
 	//updating the time for enemy spawning
@@ -148,6 +214,7 @@ void Game::updateEnemies()
 			this->health -= 1;
 		}
 	}
+
 	//check if clicked
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
@@ -172,6 +239,7 @@ void Game::updateEnemies()
 		this->mouseHeld = false;
 	}
 }
+*/
 
 //everything is being calculated behind the scenes
 void Game::update()
@@ -185,14 +253,16 @@ void Game::update()
 		//std::cout << "Mouse pos: " << sf::Mouse::getPosition().x << " " << sf::Mouse::getPosition().y << "\n";
 
 		//relative to the window
-		//std::cout << "Mouse pos: " << sf::Mouse::getPosition(*this->window).x << " " << sf::Mouse::getPosition(*this->window).y << "\n";
+		std::cout << "Mouse pos: " << sf::Mouse::getPosition(*this->window).x << " " << sf::Mouse::getPosition(*this->window).y << "\n";
 
 		this->updateText();
 
-		this->updateEnemies();
+		//this->updateEnemies();
+		this->updateButtons();
 	}
 
-	if (this->health <= 0)
+	//if the user uses the right buttion, we exit the game
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{
 		this->endGame = true;
 	}
@@ -203,6 +273,13 @@ void Game::renderText(sf::RenderTarget& target)
 	target.draw(this->uiText);
 }
 
+void Game::renderButtons(sf::RenderTarget& target)
+{
+	target.draw(this->userClickerButton);
+	target.draw(this->upgradeClickedMultiplierButton);
+	target.draw(this->upgradePassiveMultiplierButton);
+}
+/*
 void Game::renderEnemies(sf::RenderTarget& target)
 {
 	for (auto& e : this->enemies)
@@ -210,7 +287,7 @@ void Game::renderEnemies(sf::RenderTarget& target)
 		target.draw(e);
 	}
 }
-
+*/
 //seeing the calculations
 void Game::render()
 {
@@ -222,8 +299,8 @@ void Game::render()
 	*/
 	this->window->clear();
 
-	this->renderEnemies(*this->window);
-
+	//this->renderEnemies(*this->window);
+	this->renderButtons(*this->window);
 	this->renderText(*this->window);
 	//draw game objects
 	this->window->display();
