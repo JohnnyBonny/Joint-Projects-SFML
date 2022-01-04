@@ -126,9 +126,22 @@ void Game::updateText()
 {
 
 	std::stringstream ss;
+
+	//gets the time from when userClock was first instantciated to when
+	//this line was called
+	userTime = userClock.getElapsedTime();
+
+	//every second updates the user clicks with the passive clicks
+	if (floor(userTime.asSeconds()) == 1)
+	{
+		userClicks += passiveMultiplier;
+		userClock.restart();
+	}
+
 	ss << "Clicks:" << this->userClicks << "\n";
-	ss << "Passive Clicks:" << this->passiveMultiplier << "\n";
-	ss << "Clicks per click:" << this->clickMultiplier << "\n";
+	ss << "Clicks per second: " << this->passiveMultiplier << "\n";
+	ss << "Clicks per click: " << this->clickMultiplier << "\n";
+
 	this->uiText.setString(ss.str());
 }
 
@@ -151,11 +164,13 @@ void Game::updateButtons()
 					clickMultiplier += storeClickerMultiplier;
 					PriceClickerMuliplier *= 1.5;
 					storeClickerMultiplier *= 2.5;
+					//need to fix
 					userClicks -= PriceClickerMuliplier;
 				}
 				else
 				{
 					std::stringstream ss;
+					//need to fix
 					ss << "Sorry, not enough clicks!!"
 					   << "\n";
 					this->uiText.setString(ss.str());
@@ -169,11 +184,13 @@ void Game::updateButtons()
 					passiveMultiplier += storePassiveMuliplier;
 					PricePassiveMultiplier *= 1.5;
 					storePassiveMuliplier *= 2.5;
+					//need to fix
 					userClicks -= PricePassiveMultiplier;
 				}
 				else
 				{
 					std::stringstream ss;
+					//need to fix
 					ss << "Sorry, not enough clicks!!"
 					   << "\n";
 					this->uiText.setString(ss.str());
@@ -253,7 +270,7 @@ void Game::update()
 		//std::cout << "Mouse pos: " << sf::Mouse::getPosition().x << " " << sf::Mouse::getPosition().y << "\n";
 
 		//relative to the window
-		std::cout << "Mouse pos: " << sf::Mouse::getPosition(*this->window).x << " " << sf::Mouse::getPosition(*this->window).y << "\n";
+		//std::cout << "Mouse pos: " << sf::Mouse::getPosition(*this->window).x << " " << sf::Mouse::getPosition(*this->window).y << "\n";
 
 		this->updateText();
 
@@ -262,10 +279,12 @@ void Game::update()
 	}
 
 	//if the user uses the right buttion, we exit the game
+	/*
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 	{
 		this->endGame = true;
 	}
+	*/
 }
 
 void Game::renderText(sf::RenderTarget& target)

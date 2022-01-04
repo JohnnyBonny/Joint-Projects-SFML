@@ -4,6 +4,7 @@
 
 int main()
 {
+
 	//Init srand
 	srand(static_cast<unsigned>(time(NULL)));
 

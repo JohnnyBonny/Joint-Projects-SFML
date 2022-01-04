@@ -6,8 +6,8 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
+#include <stdlib.h>
 #include <vector>
-
 class Game
 {
 private:
@@ -37,6 +37,8 @@ private:
 	double storeClickerMultiplier; //the Clicker Multiplier value in the store
 	double storePassiveMuliplier;  //the Passive Multiplier value in the store
 	bool mouseHeld;				   //checks to see if the user is holding down on the mouse
+	sf::Time userTime;			   //Used to get the elapse time
+	sf::Clock userClock;		   //Used to begin the timer for the program
 
 	//Game Objects
 	sf::CircleShape userClickerButton;				   //the object the user uses to add to their clicker score
